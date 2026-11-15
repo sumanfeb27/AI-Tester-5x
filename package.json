@@ -1,0 +1,31 @@
+{
+  "name": "ai-tester-5x",
+  "version": "1.0.0",
+  "description": "Playwright migration of the AI-Tester-5x Selenium (Java/TestNG) suite",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:list": "playwright test --list",
+    "typecheck": "tsc --noEmit",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://login.salesforce.com/?locale=in"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sumanfeb27/AI-Tester-5x.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sumanfeb27/AI-Tester-5x/issues"
+  },
+  "homepage": "https://github.com/sumanfeb27/AI-Tester-5x#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}
