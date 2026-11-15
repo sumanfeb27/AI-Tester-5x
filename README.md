@@ -14,6 +14,10 @@ Hands-on course material from **The Testing Academy** for testers moving into AI
   - [00 · Agent Skill Basics](#00--agent-skill-basics)
   - [01 · LLM Fundamentals from Scratch](#01--llm-fundamentals-from-scratch)
   - [02 · Prompt Engineering: RICE-POT to a Selenium Framework](#02--prompt-engineering-rice-pot-to-a-selenium-framework)
+  - [02.1 · Anti-Hallucination Rules](#021--anti-hallucination-rules)
+  - [03 · Prompt Frameworks for QA: STAR, CLEAR, CRISP](#03--prompt-frameworks-for-qa-star-clear-crisp)
+  - [03.1 · Reusable QA Prompt Templates](#031--reusable-qa-prompt-templates)
+  - [03.2 · Context Files](#032--context-files)
 - [Learnings](#-learnings)
 
 ---
@@ -24,9 +28,13 @@ Hands-on course material from **The Testing Academy** for testers moving into AI
 flowchart LR
     C0["Ch 00 · Agent Skills<br/>SKILL.md basics + advanced"] --> C1["Ch 01 · LLM Fundamentals<br/>13 lessons, one HTML guide"]
     C1 --> C2["Ch 02 · Prompt Engineering<br/>RICE-POT -> Selenium framework"]
+    C2 --> C21["Ch 02.1 · Anti-Hallucination Rules<br/>verified facts only"]
+    C21 --> C3["Ch 03 · Prompt Frameworks for QA<br/>STAR, CLEAR, CRISP -> plan, cases, bug"]
+    C3 --> C31["Ch 03.1 · Reusable Prompt Templates<br/>6 fill-in-the-blank QA prompts"]
+    C31 --> C32["Ch 03.2 · Context Files<br/>project, feature, testing, constraints"]
 
     classDef done fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
-    class C0,C1,C2 done
+    class C0,C1,C2,C21,C3,C31,C32 done
 ```
 
 ---
@@ -38,6 +46,10 @@ flowchart LR
 | 00 | [Agent Skill Basics](Chapter_00_SKILL_Basics/) | A basic and an advanced test-plan skill (Jira ticket -> reviewed test plan) | `SKILL.md` + references + scripts | ✅ |
 | 01 | [LLM Fundamentals from Scratch](Chapter_01_LLM_Basics/) | 13 plain-words lessons: tokens, temperature, context, RAG, MCP, agents, testing LLM output | Single-file HTML guide | ✅ |
 | 02 | [Prompt Engineering](Chapter_02_Prompt_Engineering/RICE_POT/) | A RICE-POT prompt turned into a Selenium + Java framework for the Salesforce login page, run headless and headed | Maven + TestNG + Allure | ✅ |
+| 02.1 | [Anti-Hallucination Rules](Chapter_02_Prompt_Engineering/anti-hallucination.rules.md) | A reusable rule block that limits a QA assistant to the input you give it and makes it report what is missing | Prompt rules (Markdown) | ✅ |
+| 03 | [Prompt Frameworks for QA](Chapter_03_Prompt_Engineering_QA/) | Three prompt frameworks for the VWO login page: STAR -> test plan, CLEAR -> 10 test cases, CRISP -> one bug report | Prompts (Markdown) + Word outputs | ✅ |
+| 03.1 | [Reusable QA Prompt Templates](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/) | Six fill-in-the-blank prompts: basic, PRD-based, API, negative, security and regression test cases | Prompt templates (Markdown) | ✅ |
+| 03.2 | [Context Files](Chapter_03_Prompt_Engineering_QA/00_context-vwo/) | Four context files (project, feature, testing, constraints) you fill once and paste above any prompt | Context templates (Markdown) | ✅ |
 
 ---
 
@@ -61,6 +73,7 @@ AITesterBlueprint5x/
 ├── Chapter_01_LLM_Basics/
 │   └── LLM_Fundamentals.html                # 13-lesson guide, open in any browser
 ├── Chapter_02_Prompt_Engineering/
+│   ├── anti-hallucination.rules.md          # reusable guardrails: facts only, four-part output
 │   └── RICE_POT/
 │       ├── REALPROMPT_RICE_POT.md           # the filled RICE-POT prompt behind the framework
 │       ├── Template_RICE_POT/               # blank RICE-POT template + guardrail block
@@ -76,6 +89,27 @@ AITesterBlueprint5x/
 │                   │   ├── base/BaseTest.java       # config, one driver per test, failure evidence
 │                   │   └── tests/                   # ValidLoginTest, InvalidLoginTest
 │                   └── resources/                   # config.properties, allure.properties
+├── Chapter_03_Prompt_Engineering_QA/
+│   ├── STAR.md                              # Situation, Task, Action, Result -> test plan
+│   ├── Template.md                          # test plan table of contents the STAR prompt fills
+│   ├── CLEAR.md                             # Context, Limits, Examples, Action, Review -> test cases
+│   ├── CRISP.md                             # Context, Role, Instructions, Style, Parameters -> bug report
+│   ├── 00_context-vwo/                      # context files pasted above any prompt
+│   │   ├── context_project.md               # app, tech stack, environment URLs
+│   │   ├── context_feature.md               # user stories, acceptance criteria, rules, errors
+│   │   ├── context_testing.md               # scope, test data, environment, known issues
+│   │   └── context_constraints.md           # MUST / MUST NOT rules and output markers
+│   ├── 01_reuse-templates/                  # 6 fill-in-the-blank QA prompts
+│   │   ├── Template1_Basic_TC_Gen.md        # [NUMBER] test cases for [FEATURE]
+│   │   ├── Template2_PRD_TC_Comprehensive.md    # PRD -> functional, negative, boundary, edge
+│   │   ├── Template3_APITest_Gen.md         # API docs -> status-code-based tests
+│   │   ├── Template4_Negative_TC.md         # negative cases only
+│   │   ├── Template5_Security_TC.md         # OWASP-style checks, no real payloads
+│   │   └── Template6_Regression_Test_Suite.md   # end-to-end regression suite with time estimates
+│   └── output/
+│       ├── VWO_Login_Test_Plan.md / .docx   # STAR output (Markdown source + Word)
+│       ├── VWO_Login_Test_Cases.docx        # CLEAR output: 10 cases, all "Not Run"
+│       └── VWO_Login_Bug_Report.docx        # CRISP output: hypothetical training bug
 ├── learnings/                               # one-page approach notes per solved problem
 ├── output/                                  # generated test plans (HTML + PDF)
 └── .env                                     # Jira credentials, git-ignored
@@ -297,6 +331,265 @@ allure serve target/allure-results      # needs the Allure CLI (brew install all
 ```
 
 Every `config.properties` key (`base.url`, `browser`, `headless`, `explicit.wait.seconds`, `page.load.timeout.seconds`) can be overridden with `-Dkey=value`. When a test or a setUp fails, a screenshot, the URL and the page source are attached to the Allure report.
+
+---
+
+### 02.1 · Anti-Hallucination Rules
+
+**Concept:** [anti-hallucination.rules.md](Chapter_02_Prompt_Engineering/anti-hallucination.rules.md) is a reusable prompt block that limits a QA assistant to what you actually give it (PRD, API docs, logs, screenshots, test data, user input) and makes it answer in four fixed sections: Verified Facts, Missing / Unknown Information, Generated Output, Self-Validation Check.
+
+**Why:** Asked about a system it cannot see, an LLM fills the gaps with "typical" behaviour, so a test can look right while checking a feature, an error code or a button that does not exist.
+
+**Q&A: why use this?**
+- **Q: When do I reach for it?** A: Whenever AI output turns into something people will trust: test cases, bug reports, locators. Paste it above your task and input, or use it as the guardrail block in a RICE-POT prompt.
+- **Q: What does it replace?** A: Telling the model "be accurate", which gives it no way to say "I don't know". These rules give it two exact phrases, `Insufficient information to determine.` and `Inference (low confidence)`, so you can search the output for them.
+- **Q: What's the gotcha?** A: It lowers the risk but does not remove it. The Self-Validation Check is written by the same model that wrote the output, so a person still has to trace each assertion back to the input.
+
+```mermaid
+flowchart TD
+    A["Your input<br/>PRD, API docs, logs, screenshots, test data"] --> B["Step 1: extract verifiable facts"]
+    B --> C["Step 2: list unknown or missing information"]
+    C --> D["Step 3: generate output only from Step 1 facts"]
+    D --> Q{"For each detail"}
+    Q -->|"Stated in the input"| G["Write it, traceable to the input"]
+    Q -->|"Inferred"| H["Label it: Inference (low confidence)"]
+    Q -->|"Missing or unclear"| I["Say: Insufficient information to determine."]
+    G --> E["Step 4: self-check for hallucinations or contradictions"]
+    H --> E
+    I --> E
+    E --> F["Four-part output"]
+
+    classDef guard fill:#fff3e0,stroke:#ef6c00,color:#e65100
+    class H,I guard
+```
+
+**Where the two phrases already appear in this repo**
+
+| File | How it uses them |
+|:-----|:-----------------|
+| [REALPROMPT_RICE_POT.md](Chapter_02_Prompt_Engineering/RICE_POT/REALPROMPT_RICE_POT.md) | Guardrail block of the Selenium prompt |
+| [Template.RICEPPOT.md](Chapter_02_Prompt_Engineering/RICE_POT/Template_RICE_POT/Template.RICEPPOT.md) | Guardrail block of the blank template |
+| [ValidLoginTest.java](Chapter_02_Prompt_Engineering/RICE_POT/SeleniumFramework/src/test/java/com/atb5x/salesforce/tests/ValidLoginTest.java) | The skip reason when no credentials are given, and the label on the inferred success check |
+
+**Code sample:** a shortened copy of the rules with a real task. Paste it into any chat model.
+
+```text
+ROLE: You are a QA assistant operating under strict verification rules.
+
+You may ONLY use information explicitly provided in the input below.
+
+1. DO NOT invent features, APIs, error codes, UI elements, or behavior.
+2. DO NOT assume default or "typical" system behavior.
+3. If information is missing or unclear, respond with:
+   "Insufficient information to determine."
+4. Every assertion must be traceable to provided input.
+5. If a detail is inferred, label it explicitly as:
+   "Inference (low confidence)".
+6. Output must be deterministic and repeatable.
+
+OUTPUT FORMAT (STRICT):
+- Verified Facts:
+- Missing / Unknown Information:
+- Generated Output:
+- Self-Validation Check:
+
+TASK: Write test cases for the Salesforce login errors in the input.
+
+INPUT:
+- Empty username shows "Error: Please enter your username."
+- Empty password shows "Error: Please enter your password."
+```
+
+**What to check:** the input says nothing about account lockout, so a lockout test under Generated Output means the model ignored the rules.
+
+---
+
+### 03 · Prompt Frameworks for QA: STAR, CLEAR, CRISP
+
+**Concept:** Three prompt frameworks, each matched to one QA document, all run against the same VWO login page (`app.vwo.com`). [STAR](Chapter_03_Prompt_Engineering_QA/STAR.md) (Situation, Task, Action, Result) produces a test plan, [CLEAR](Chapter_03_Prompt_Engineering_QA/CLEAR.md) (Context, Limits, Examples, Action, Review) produces 10 test cases, and [CRISP](Chapter_03_Prompt_Engineering_QA/CRISP.md) (Context, Role, Instructions, Style, Parameters) produces one bug report.
+
+**Why:** Each QA document fails in its own way: a plan drifts into invented rules, test cases drift in format, a bug report mixes what was seen with what was guessed. Each framework has a slot that blocks that failure.
+
+**Q&A: why use this?**
+- **Q: When do I reach for which one?** A: STAR when you need a planning document, CLEAR when you need many items in one fixed format (it carries a filled example and a review checklist), CRISP when one precise artifact must be readable by someone who was not there.
+- **Q: What does it replace?** A: "Write a test plan for the login page", which returns password rules, error messages and session timeouts that nobody approved.
+- **Q: What's the gotcha?** A: The requirements decide what can be tested. All three prompts tell the model to write "Requires clarification", "Not supplied" or "Not provided" instead of guessing, so read those markers first: they are the questions to take to the Product Owner.
+
+```mermaid
+flowchart LR
+    R["VWO login requirements<br/>REQ-01 to REQ-05"] --> S["STAR<br/>Situation · Task · Action · Result"]
+    R --> C["CLEAR<br/>Context · Limits · Examples · Action · Review"]
+    R --> K["CRISP<br/>Context · Role · Instructions · Style · Parameters"]
+    S --> SO["Test plan<br/>16 scenarios, 11 open questions"]
+    C --> CO["10 test cases<br/>all Not Run"]
+    K --> KO["1 bug report<br/>Hypothetical training example"]
+    SO --> G["🛑 Review: every 'Requires clarification'<br/>goes to the Product Owner"]
+    CO --> G
+    KO --> G
+
+    classDef gate fill:#fff3e0,stroke:#ef6c00,color:#e65100
+    class G gate
+```
+
+**Which framework for which document**
+
+| Framework | Output in this chapter | The slot that does the most work | Unknowns are marked as |
+|:----------|:-----------------------|:---------------------------------|:-----------------------|
+| STAR | [Test plan](Chapter_03_Prompt_Engineering_QA/output/VWO_Login_Test_Plan.md) ([.docx](Chapter_03_Prompt_Engineering_QA/output/VWO_Login_Test_Plan.docx)), follows [Template.md](Chapter_03_Prompt_Engineering_QA/Template.md) | Action: "Do not invent password rules, exact error messages, or session timeouts." | Requires clarification, (Recommendation) |
+| CLEAR | [10 test cases](Chapter_03_Prompt_Engineering_QA/output/VWO_Login_Test_Cases.docx), Jira-style table | Examples: one filled test case fixes the format for all ten | Requires clarification |
+| CRISP | [Bug report](Chapter_03_Prompt_Engineering_QA/output/VWO_Login_Bug_Report.docx), under 500 words | Instructions: "Distinguish observed behavior from assumptions." | Not supplied, Not provided, Provisional |
+
+**Code sample:** the CRISP prompt behind the bug report, shortened. Paste it into any chat model.
+
+```text
+Context: For a training exercise, assume I observed this defect at https://app.vwo.com/:
+- Requirement: Email and password are mandatory.
+- Action: Enter a registered test email, leave the password empty, submit the login form.
+- Observation: The form submits, but no visible validation feedback appears.
+- Reproducibility: 3 out of 3 attempts.
+- Browser, OS, build, time, screenshots, logs: Not supplied.
+Role: Act as a senior QA engineer writing a clear, reproducible bug report.
+Instructions: Title, Environment, Preconditions, Test Data, Steps to Reproduce,
+  Expected Result, Actual Result, Reproducibility, Suggested Severity, Attachments.
+  Do not invent the exact validation text. Distinguish observed behavior from
+  assumptions. Label severity as provisional.
+Style: Concise, factual, numbered steps, for a developer who has not seen the issue.
+Parameters: One report, under 500 words, placeholders for accounts,
+  label it "Hypothetical training example."
+```
+
+**What to check:** the observation never says whether the user ended up logged in. A good answer lists that as "Not observed" and makes severity depend on it, a bad one assumes it either way.
+
+---
+
+### 03.1 · Reusable QA Prompt Templates
+
+**Concept:** [01_reuse-templates/](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/) holds six short prompts you fill in and reuse. Each has the same four parts: ROLE, TASK, CONSTRAINTS and a fixed FORMAT table, plus a slot like `[PASTE REQUIREMENTS HERE]` for your input.
+
+**Why:** Writing a full STAR or CLEAR prompt for every small job is slow, so these give you a tested starting point for the six test-design jobs testers do most.
+
+**Q&A: why use this?**
+- **Q: When do I reach for a template instead of STAR / CLEAR / CRISP?** A: For quick, repeatable jobs ("negative cases for this form", "API tests for this endpoint"). Use the full frameworks when the output is a document others will sign off.
+- **Q: What does it replace?** A: Retyping the role, rules and table columns every time, and getting a different table shape each run.
+- **Q: What's the gotcha?** A: Only Templates 1 to 3 tell the model what to do when information is missing. Templates 4 to 6 do not, and Template 6 asks for time estimates the input cannot support. Paste the [anti-hallucination rules](Chapter_02_Prompt_Engineering/anti-hallucination.rules.md) above them, or add a "Not specified" line to their CONSTRAINTS.
+
+```mermaid
+flowchart TD
+    Q{"What do you have?"} -->|"A few requirements"| T1["Template 1<br/>Basic test cases"]
+    Q -->|"A PRD, BRD, Jira or Confluence page"| T2["Template 2<br/>Comprehensive from PRD"]
+    Q -->|"API docs"| T3["Template 3<br/>API tests"]
+    Q -->|"A form or feature to break"| T4["Template 4<br/>Negative only"]
+    Q -->|"A feature with auth or user input"| T5["Template 5<br/>Security"]
+    Q -->|"A module before release"| T6["Template 6<br/>Regression suite"]
+    T4 --> G["Add a 'Not specified' rule<br/>or the anti-hallucination block"]
+    T5 --> G
+    T6 --> G
+
+    classDef guard fill:#fff3e0,stroke:#ef6c00,color:#e65100
+    class G guard
+```
+
+**The six templates**
+
+| # | Template | Output columns | Says what to do when info is missing? |
+|:-:|:---------|:---------------|:-------------------------------------:|
+| 1 | [Basic TC Gen](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template1_Basic_TC_Gen.md) | Test ID, Description, Pre-conditions, Steps, Expected Result, Priority | ✅ "Not specified" |
+| 2 | [PRD TC Comprehensive](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template2_PRD_TC_Comprehensive.md) | TID, Category, Description, Pre-conditions, Steps, Expected, Priority | ✅ "Needs clarification" |
+| 3 | [API Test Gen](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template3_APITest_Gen.md) | Test ID, Endpoint, Method, Request Body, Expected Status, Expected Response | ✅ No undocumented behavior |
+| 4 | [Negative TC](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template4_Negative_TC.md) | Test ID, Invalid Scenario, Input, Expected Error | ❌ Add it |
+| 5 | [Security TC](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template5_Security_TC.md) | Test ID, Security Risk, Attack Vector, Expected Secure Behavior | ❌ Add it |
+| 6 | [Regression Suite](Chapter_03_Prompt_Engineering_QA/01_reuse-templates/Template6_Regression_Test_Suite.md) | Test ID, Scenario, Data Setup, Steps, Est. Time, Priority | ❌ Add it |
+
+**Code sample:** Template 4 filled in for the VWO login page, with the missing-info rule added. Paste it into any chat model.
+
+```text
+ROLE: You are a QA Engineer focused on negative testing.
+
+TASK: Generate negative test cases for the VWO login page (https://app.vwo.com/).
+
+FOCUS AREAS:
+- Invalid inputs
+- Missing required fields
+- Unauthorized access
+
+CONSTRAINTS:
+- Do NOT include happy path scenarios
+- Each test must validate error handling
+- Include expected error message if documented
+- If the expected behavior is not documented, write "Not specified"
+
+FORMAT:
+| Test ID | Invalid Scenario | Input | Expected Error |
+
+FEATURE REQUIREMENTS:
+- Email and password are mandatory.
+- Invalid credentials must not grant access.
+- Invalid login shows "Your email, password, IP address or location did not match"
+```
+
+**What to check:** the requirements give no message for empty fields, so the empty-email and empty-password rows should say "Not specified", not a made-up message like "Password is required".
+
+---
+
+### 03.2 · Context Files
+
+**Concept:** [00_context-vwo/](Chapter_03_Prompt_Engineering_QA/00_context-vwo/) splits everything the model needs to know into four files you fill once per project and paste above any prompt: [project](Chapter_03_Prompt_Engineering_QA/00_context-vwo/context_project.md) (app, tech stack, URLs), [feature](Chapter_03_Prompt_Engineering_QA/00_context-vwo/context_feature.md) (stories, acceptance criteria, validation rules, error messages), [testing](Chapter_03_Prompt_Engineering_QA/00_context-vwo/context_testing.md) (scope, test data, environment) and [constraints](Chapter_03_Prompt_Engineering_QA/00_context-vwo/context_constraints.md) (MUST / MUST NOT rules).
+
+**Why:** The templates in 03.1 are only as good as what you paste into them, and retyping the app, rules and test data for every prompt leads to gaps the model fills by guessing.
+
+**Q&A: why use this?**
+- **Q: When do I reach for it?** A: Once per project or feature. Fill the four files, then stack them above any 03.1 template or STAR / CLEAR / CRISP prompt: project, feature, testing, constraints, then the task.
+- **Q: What does it replace?** A: The "Context" paragraph you rewrite in every prompt, and the missing-info rule that Templates 4 to 6 lack: `context_constraints.md` adds "Not specified in requirements", "[NEEDS CLARIFICATION]" and "[ASSUMPTION]" to any prompt.
+- **Q: What's the gotcha?** A: Three of the four files are still blank templates, and their sample rows look real (`Email: Valid format required`, `400 | ...`, `test@example.com`). Delete any row you did not fill, or the model will treat it as a requirement.
+
+```mermaid
+flowchart TD
+    P["context_project.md<br/>app, stack, URLs"] --> S["Stacked context"]
+    F["context_feature.md<br/>stories, criteria, rules, errors"] --> S
+    T["context_testing.md<br/>scope, data, environment"] --> S
+    C["context_constraints.md<br/>MUST / MUST NOT, markers"] --> S
+    S --> X["+ any task prompt<br/>03.1 template, STAR, CLEAR, CRISP"]
+    X --> O["Output marked with<br/>[NEEDS CLARIFICATION] / [ASSUMPTION]"]
+
+    classDef guard fill:#fff3e0,stroke:#ef6c00,color:#e65100
+    class C guard
+```
+
+**What each file holds**
+
+| File | Fill in | Filled for VWO yet? |
+|:-----|:--------|:-------------------:|
+| `context_project.md` | Name, type, domain, tech stack, dev / staging / prod URLs, key constraints | ❌ Template |
+| `context_feature.md` | Overview, user stories, acceptance criteria, API endpoints, UI elements, validation rules, error messages | ❌ Template |
+| `context_testing.md` | In / out of scope, test data table, browser / device / OS, dependencies, known issues | ❌ Template |
+| `context_constraints.md` | Use only provided documents, no invented errors, endpoints or validation, mark gaps and assumptions | ✅ Ready to use |
+
+**Code sample:** `context_feature.md` filled for the VWO login page from the Chapter 03 requirements, followed by the constraints and a task. Rows with no source are deleted, not guessed.
+
+```markdown
+# Feature Context: VWO Login
+
+## Overview
+Login page at https://app.vwo.com/ for registered users.
+
+## Acceptance Criteria
+- [ ] Registered users can log in with valid credentials.
+- [ ] Invalid credentials must not grant access and show an error.
+- [ ] Email and password are mandatory.
+- [ ] Successful login opens the authenticated dashboard.
+
+## Error Messages
+| Code | Message |
+|------|---------|
+| Not specified in requirements | Your email, password, IP address or location did not match |
+
+# Constraints & Rules
+(paste context_constraints.md here)
+
+TASK: Generate 8 test cases for VWO Login using Template 1's format.
+```
+
+**What to check:** the empty-field message is not in the context, so those rows must say "Not specified in requirements" or "[NEEDS CLARIFICATION]", and every "[ASSUMPTION]" in the output is a question for the Product Owner.
 
 ---
 
